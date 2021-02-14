@@ -11,33 +11,36 @@ this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-# with open('LICENSE') as f:
-#     license = f.read()
 
-
-setup_requirements = [
-    "click",
-    "requests",
-    "setuptools",
-    "PyPDF2",
-    "Pillow",
-    "pdf2image",
-    "pytesseract",
-    "opencv-python",
-    "numpy",
+requirements = [
+    "numpy~=1.20.1",
+    "setuptools~=53.0.0",
+    "pytz~=2021.1",
+    "nose~=1.3.7",
+    "opencv-python~=4.5.1.48",
+    "click~=7.1.2",
+    "requests~=2.25.1",
+    "PyPDF2~=1.26.0",
+    "Pillow~=8.1.0",
+    "pdf2image~=1.14.0",
+    "pytesseract~=0.3.7",
 ]
+
+setup_requirements = []
+
 
 test_requirements = []
 
 setup(
     name='ocr-joplin-notes',
-    version='0.1.2',
+    version='0.1.4',
     description='Add OCR data to Joplin notes',
     long_description=long_description,
     long_description_content_type="text/markdown",
     author='Matthijs Dekker',
     author_email='joplin-development@dekkr.nl',
     url='https://github.com/plamola/ocr-joplin-notes',
+    install_requires=requirements,
     license=license,
     packages=find_packages(exclude=('tests', 'docs')),
     include_package_data=True,
