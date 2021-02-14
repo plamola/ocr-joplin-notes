@@ -7,7 +7,6 @@ This scrip will try to add OCR data, and possibly a preview image, to notes in J
 #### 1. As a Joplin user, I want to be able to search for any text, whether it is in the note itself, or in an attachment.
    When making the switch from Evernote to Joplin, there was one thing missing for me.
    Evernote uses OCR on attachments, which makes it possible to do a full text search. This is something that is lacking in Joplin.
-   Time to get the elephant out of the room (wink wink, nudge nudge Evernote)
    The excellent [rest_uploader](https://github.com/kellerjustin/rest-uploader) has the ability to upload files to Joplin and add OCR data as an HTML comment in the note.
    For existing Joplin notes, either created manually, by the hotfolder plugin or via the Evernote import, the OCR data will not be present.
 #### 2. As a Joplin user, I want to have a preview image in the notes I've imported from Evernote.
