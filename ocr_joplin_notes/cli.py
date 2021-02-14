@@ -15,10 +15,9 @@ from . import __version__
 def parse_argument(arg):
     """Helper function for wild arguments"""
     if arg in ["No", "N", "NO", "OFF", "off", "n", "no"]:
-        arg = "no"
+        return "no"
     else:
-        arg = "yes"
-    return arg
+        return "yes"
 
 
 @click.command()

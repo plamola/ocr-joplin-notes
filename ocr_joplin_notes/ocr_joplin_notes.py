@@ -128,7 +128,7 @@ def has_existing_ocr_section(note):
 def is_created_by_rest__uploader(note):
     """If the note starts with: <filename> uploaded from <host>
     and has a HTML comment section,
-    and has at least on attachment
+    and has at least one attachment
     assume it contains OCR data from the rest_uploader"""
     first_lines = "{}".format(note.body).split("\n", 3)
     file_name = first_lines[0].split(" uploaded from")[0]
@@ -156,8 +156,8 @@ def ocr_resources(note):
         resources = get_note_resources(note.id)
         for resource_json in resources:
             resource = get_resource(resource_json.get("id"))
-            print(f"- file: {resource.filename}")
-            data = ocr_resource(resource)
+            print(f"- file: {resource.title}")
+            data = ocr_resource(resource, ADD_PREVIEWS and note.markup_language == 2)
             if data.pages is not None:
                 print(f"  - pages extracted: {len(data.pages)}")
                 resulting_text = ""
@@ -213,7 +213,7 @@ class OcrResult:
         self.preview_file = preview_file
 
 
-def ocr_resource(resource):
+def ocr_resource(resource, create_preview=True):
     mime_type = resource.mime
     full_path = save_resource_to_file(resource)
     try:
@@ -223,11 +223,11 @@ def ocr_resource(resource):
                 return OcrResult(result.pages, ResourceType.IMAGE)
         elif mime_type == "application/pdf":
             ocr_result = extract_text_from_pdf(full_path, language=LANGUAGE)
-            if ADD_PREVIEWS:
+            if create_preview:
                 preview_file = pdf_page_as_image(full_path, is_preview=True)
                 return OcrResult(ocr_result.pages, ResourceType.PDF, preview_file)
             else:
-                return OcrResult(ocr_result, ResourceType.PDF)
+                return OcrResult(ocr_result.pages, ResourceType.PDF)
         return OcrResult(None)
     except (TypeError, OSError) as e:
         return OcrResult(None)

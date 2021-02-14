@@ -26,6 +26,7 @@ def get_pdf_file_reader(filename):
 
 def pdf_page_as_image(filename, page_num=0, is_preview=False):
     if not is_preview:
+        # high dpi and grayscale for the best OCR result
         pages = convert_from_path(filename, dpi=600, grayscale=True)
     else:
         pages = convert_from_path(filename)
@@ -60,19 +61,14 @@ def rotate_image(filename):
         angle = -(90 + angle)
     else:
         angle = -angle
-    (hight, width) = image.shape[:2]
-    center = (width // 2, hight // 2)
+    (height, width) = image.shape[:2]
+    center = (width // 2, height // 2)
     matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
-    rotated_image = cv2.warpAffine(image, matrix, (width, hight),
+    rotated_image = cv2.warpAffine(image, matrix, (width, height),
                                    flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
     temp_file = f"{tempfile.gettempdir()}/{uuid4()}.png"
     cv2.imwrite(temp_file, rotated_image)
     return temp_file
-
-
-# class FileOCR:
-#     def __init__(self, language="eng"):
-#         self.LANGUAGE = language
 
 
 def extract_text_from_pdf(filename, language="eng"):
@@ -93,6 +89,8 @@ def extract_text_from_pdf(filename, language="eng"):
             selected_text = embedded_text
         else:
             selected_text = extracted_text
+        selected_text = selected_text.strip()
+        # 10 or less characters is probably just garbage
         if len(selected_text) > 10:
             text.extend([selected_text])
     return FileOcrResult(text)
@@ -107,7 +105,11 @@ def extract_text_from_image(filename, auto_rotate=False, language="eng"):
             result = extract_text_from_image(filename, auto_rotate=False)
             os.remove(rotated_image)
             text = result.pages[0]
-        return FileOcrResult([text])
+        # 10 or less characters is probably just garbage
+        if len(text.strip()) > 10:
+            return FileOcrResult([text.strip()])
+        else:
+            return FileOcrResult(None)
     except TesseractError as e:
         logging.debug(e.message)
     return None

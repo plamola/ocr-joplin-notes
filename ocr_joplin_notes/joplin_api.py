@@ -22,9 +22,9 @@ class JoplinNote:
 class JoplinResource:
     def __init__(self, json_data):
         self.id = json_data.get("id")
-        self.title = json_data.get("title")
         self.filename = json_data.get("filename")
         self.mime = json_data.get("mime")
+        self.title = json_data.get("title")
 
 
 def paginate_by_title(page: int):
@@ -119,5 +119,4 @@ def get_resource(resource_id):
 
 def save_resource(note_id, filename: str, title: str):
     res = rest_post_file("/resources/{}".format(note_id), filename, f'{{"title":"{title}", "filename":"{title}.png"}}')
-    # print("created resource: {}".format(res.json()["id"]))
     return res.json()["id"]
