@@ -84,9 +84,9 @@ This is mode you are looking for.
 ### Command line examples
 
 ```shell
-ocr-joplin-notes --mode=TAG_NOTES
-ocr-joplin-notes --mode=DRY_RUN --tag=my_notes_test --language=nld --add-previews=off
-ocr-joplin-notes --mode=FULL_RUN --tag=my_notes_for --language=get 
+python3 ocr_joplin_notes.cli --mode=TAG_NOTES
+python3 ocr_joplin_notes.cli --mode=DRY_RUN --tag=my_notes_test --language=nld --add-previews=off
+python3 ocr_joplin_notes.cli --mode=FULL_RUN --tag=my_notes_for --language=get 
 ```
 
 
