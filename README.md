@@ -22,7 +22,7 @@ This scrip will try to add OCR data, and possibly a preview image, to notes in J
 
 **WARNING This script has the potential to mess up all your Joplin notes. But you are not worried, since you make regular backups of your Joplin notes already. Right??**
 
-##Installation
+## Installation
 Requirements:
 * Optional environment variable `JOPLIN_SERVER`. If not present it will look for the Joplin client on the current machine
 * Required environment variable `JOPLIN_TOKEN`
@@ -72,6 +72,17 @@ Every note will be tagged with one of the following:
 
 The `FULL_RUN` mode will do the same as the `DRY_RUN` mode, but this time, it **will** make the changes to your Joplin notes.
 This is mode you are looking for.
+
+### Example
+
+```shell
+ocr-joplin-notes --mode=TAG_NOTES
+ocr-joplin-notes --mode=DRY_RUN --tag=my_notes_test --language=nld --add-previews=off
+ocr-joplin-notes --mode=FULL_RUN --tag=my_notes_with_ocr --language=ger 
+```
+
+
+
 
 
 #### Closing remarks
