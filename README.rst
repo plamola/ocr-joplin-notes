@@ -1,10 +1,11 @@
-Sample Module Repository
+OCR Joplin Notes
 ========================
 
-This simple project is an example repo for Python projects.
+This scrip will try to add OCR data (and possibly a preview image) to all notes in Joplin which are tagged with the tag specified on startup
 
-`Learn more <http://www.kennethreitz.org/essays/repository-structure-and-python>`_.
+** WARNING ** This scrip has to potential to mess up all your Joplin notes. But you are not worried, since you make regular backups of you Joplin notes already. Right??
 
----------------
+Since this script will update your notes, several modes have been added, so the user of this script can verify if the detection in this script works as should be expected.
 
-If you want to learn more about ``setup.py`` files, check out `this repository <https://github.com/kennethreitz/setup.py>`_.
+See the ``README.md`` for full details
+

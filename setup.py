@@ -12,13 +12,13 @@ with open('LICENSE') as f:
     license = f.read()
 
 setup(
-    name='sample',
+    name='ocr-joplin-notes',
     version='0.1.0',
-    description='Sample package for Python-Guide.org',
-    long_description=readme,
-    author='Kenneth Reitz',
-    author_email='me@kennethreitz.com',
-    url='https://github.com/kennethreitz/samplemod',
+    description='Add OCR data to Joplin notes',
+    long_description='See the README.md',
+    author='Matthijs Dekker',
+    author_email='joplin-development@dekkr.nl',
+    url='https://github.com/plamola/ocr-joplin-notes',
     license=license,
     packages=find_packages(exclude=('tests', 'docs'))
 )
