@@ -10,7 +10,7 @@ else:
     print("Please set the environment variable JOPLIN_TOKEN")
     exit(1)
 if os.environ.get('JOPLIN_SERVER') is not None:
-    JOPLIN_SERVER = "token=" + os.environ['JOPLIN_SERVER']
+    JOPLIN_SERVER = os.environ['JOPLIN_SERVER']
 else:
     JOPLIN_SERVER = "http://localhost:41184"
     print("Environment variable JOPLIN_SERVER not set, using default value: http://localhost:41184")

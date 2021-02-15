@@ -33,7 +33,7 @@ test_requirements = []
 
 setup(
     name='ocr-joplin-notes',
-    version='0.2.1',
+    version='0.2.2',
     description='Add OCR data to Joplin notes',
     long_description=long_description,
     long_description_content_type="text/markdown",
