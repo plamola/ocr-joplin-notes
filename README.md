@@ -22,6 +22,9 @@ This scrip will try to add OCR data, and possibly a preview image, to notes in J
 **WARNING This script has the potential to mess up all your Joplin notes. But you are not worried, since you make regular backups of your Joplin notes already. Right??**
 
 ## Installation
+For a quick installation, there is a docker version available. See the examples section of this readme.
+
+If you don't like docker, there is the manual installation option.
 If you already installed [rest_uploader](https://github.com/kellerjustin/rest-uploader) you probably almost setup already.
 All that is left is to install this scrip and setup the environment variables.
 
@@ -32,7 +35,6 @@ pip install ocr-joplin-notes
 Requirements:
 * Joplin's Webclipper must be enabled and your desktop client must be running.
 * Required environment variable `JOPLIN_TOKEN`. You can find your token in the webclipper settings.
-* Optional environment variable `JOPLIN_SERVER`. If not present it will look for the Joplin client on the current machine
 * Environment variable `TESSDATA_PREFIX` On Ubuntu, mine is set to `/usr/share/tesseract-ocr/4.00/tessdata`
 
 ### Modes
@@ -89,9 +91,20 @@ python3 ocr_joplin_notes.cli --mode=DRY_RUN --tag=my_notes_test --language=nld -
 python3 ocr_joplin_notes.cli --mode=FULL_RUN --tag=my_notes_for --language=get 
 ```
 
-### Still, to do
-* Make this module dockerized
-  For those of use who do not want to install all those python dependencies.
+### Docker example
+
+There is a docker image available, for those who do not want to install all the Python dependencies.
+```shell
+docker run  --env-file ./docker-env  --network="host" plamola/ocr-joplin-notes:0.2.3 python -m ocr_joplin_notes.cli --mode=TAG_NOTES
+```
+For this to work, you need to save you Joplin token saved in a file. In the example, the file is called `docker-env`. 
+The contents of this file will look someting like:
+```
+JOPLIN_TOKEN=f11db775b76e0f80ab39a932s3f79298d080d
+```
+Note the `--network="host"` parameter, to allow for access to localhost.                                                                                                   
+
+### Still to do
 * Daemonize this module
   Having this script run continuously in the background, monitoring for notes with a predefined tag, which need to receive an OCR treatment
 * Auto tagging
