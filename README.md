@@ -89,6 +89,13 @@ python3 ocr_joplin_notes.cli --mode=DRY_RUN --tag=my_notes_test --language=nld -
 python3 ocr_joplin_notes.cli --mode=FULL_RUN --tag=my_notes_for --language=get 
 ```
 
+### Still, to do
+* Make this module dockerized
+  For those of use who do not want to install all those python dependencies.
+* Daemonize this module
+  Having this script run continuously in the background, monitoring for notes with a predefined tag, which need to receive an OCR treatment
+* Auto tagging
+  Just like the rest-uploader, have the ability to apply tags to the notes based on the OCR data
 
 #### Closing remarks
 * This is the first Python code I've ever written. It might be crap. It works for me. 
