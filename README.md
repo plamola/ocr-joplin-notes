@@ -102,7 +102,8 @@ The contents of this file will look someting like:
 ```
 JOPLIN_TOKEN=f11db775b76e0f80ab39a932s3f79298d080d
 ```
-Note the `--network="host"` parameter, to allow for access to localhost.                                                                                                   
+Note the `--network="host"` parameter, to allow for access to localhost. This only seems to work on Linux systems.
+For Windows and Mac,docker might not be an option.                                                                                                   
 
 ### Still to do
 * Daemonize this module
