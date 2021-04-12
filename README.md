@@ -86,9 +86,9 @@ This is mode you are looking for.
 ### Command line examples
 
 ```shell
-python3 ocr_joplin_notes.cli --mode=TAG_NOTES
-python3 ocr_joplin_notes.cli --mode=DRY_RUN --tag=my_notes_test --language=nld --add-previews=off
-python3 ocr_joplin_notes.cli --mode=FULL_RUN --tag=my_notes_for --language=get 
+python3 -m ocr_joplin_notes.cli --mode=TAG_NOTES
+python3 -m ocr_joplin_notes.cli --mode=DRY_RUN --tag=my_notes_test --language=nld --add-previews=off
+python3 -m ocr_joplin_notes.cli --mode=FULL_RUN --tag=my_notes_for --language=get 
 ```
 
 ### Docker example
