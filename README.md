@@ -1,7 +1,7 @@
 OCR Joplin notes
 ========================
 
-This scrip will try to add OCR data, and possibly a preview image, to notes in Joplin. It will only work on notes with a tag, which must be specified on startup.
+This script will try to add OCR data, and possibly a preview image, to notes in Joplin. It will only work on notes with a tag, which must be specified on startup.
 
 ### Use cases 
 #### 1. As a Joplin user, I want to be able to search for any text, whether it is in the note itself, or in an attachment.
