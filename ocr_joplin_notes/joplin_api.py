@@ -91,7 +91,7 @@ def perform_on_tagged_notes(usage_function, tag_id, exclude_tags, page: int = 1)
             print(f"------------------------------------\nnote: {note.title}")
             print("Excluding this note\n")
     if res.json()["has_more"]:
-        return perform_on_tagged_notes(usage_function, tag_id, page + 1)
+        return perform_on_tagged_notes(usage_function, tag_id, exclude_tags, page + 1)
     else:
         return 0
 
