@@ -67,6 +67,8 @@ Every note will be tagged with one of the following tags:
 *Parameters*:
 * [required] `--tag`="my_tag"
   Only notes having the specified tag will be scanned.
+* [optional] `--exclude_tags`="my_tag"
+  Notes having the specified tag will be ignored. This Parameter can be set multiple times to exclude multiple tags.
 * [optional] `--add-preview`=`on`|`off`
   When `on`, adds a preview image for every PDF found in an HTML note. Default is `on`
   Markdown notes already have a PDF preview in the client.
@@ -88,7 +90,8 @@ This is mode you are looking for.
 ```shell
 python3 -m ocr_joplin_notes.cli --mode=TAG_NOTES
 python3 -m ocr_joplin_notes.cli --mode=DRY_RUN --tag=my_notes_test --language=nld --add-previews=off
-python3 -m ocr_joplin_notes.cli --mode=FULL_RUN --tag=my_notes_for --language=get 
+python3 -m ocr_joplin_notes.cli --mode=FULL_RUN --tag=my_notes_for --language=get
+python3 -m ocr_joplin_notes.cli --mode=FULL_RUN --tag=ojn_ocr_failed --exclude_tags=technical --exclude_tags=art
 ```
 
 ### Docker example
