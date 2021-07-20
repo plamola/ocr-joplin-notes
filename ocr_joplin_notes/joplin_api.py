@@ -81,7 +81,7 @@ def perform_on_tagged_notes(usage_function, tag_id, exclude_tags, page: int = 1)
     notes = res.json()["items"]
     for note in notes:
         note_id = note.get("id")
-        all_tags = get_all_tags(note_id)     # get all tags of the current note
+        all_tags = list(get_all_tags(note_id))     # get all tags of the current note
         # check if any tag in the list exclude_tags is equal to any tag of the current notes' tags
         if len(set(exclude_tags).intersection(all_tags)) == 0:  
             # print(note.get("title"), end=" : ")
@@ -90,6 +90,7 @@ def perform_on_tagged_notes(usage_function, tag_id, exclude_tags, page: int = 1)
             note = get_note(note_id)
             print(f"------------------------------------\nnote: {note.title}")
             print("Excluding this note\n")
+            
     if res.json()["has_more"]:
         return perform_on_tagged_notes(usage_function, tag_id, exclude_tags, page + 1)
     else:

@@ -159,7 +159,9 @@ def ocr_resources(note):
             resource = get_resource(resource_json.get("id"))
             print(f"- file: {resource.title}")
             data = ocr_resource(resource, ADD_PREVIEWS and note.markup_language == 2)
-            if data.pages is not None:
+            if data == -2:
+                return ResultTag.OCR_FAILED
+            elif data.pages is not None:
                 print(f"  - pages extracted: {len(data.pages)}")
                 resulting_text = ""
                 if data.input_resource_type == ResourceType.PDF:
@@ -232,5 +234,11 @@ def ocr_resource(resource, create_preview=True):
         return OcrResult(None)
     except (TypeError, OSError) as e:
         return OcrResult(None)
+    
     finally:
-        os.remove(full_path)
+        try:
+            os.remove(full_path)
+        except PermissionError as e:
+            print("Permission Error: " + str(e))
+            print("File: " + str(resource.title))
+            return -2
