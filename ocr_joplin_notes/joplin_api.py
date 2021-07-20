@@ -29,6 +29,15 @@ class JoplinResource:
 
 def paginate_by_title(page: int):
     return 'order_by=title&limit=10&page={}'.format(page)
+    
+
+def get_all_tags(note_id: str):
+    if note_id is None:
+        return None
+    res = rest_get('/notes/{}/tags?fields=title'.format(note_id))
+    tags = res.json()["items"]
+    list_of_tags = list([dic.get("title") for dic in tags])
+    return list_of_tags
 
 
 def find_tag_id(title: str, page: int = 1):
@@ -67,12 +76,20 @@ def tag_note(note_id, tag_title):
     return tag_id
 
 
-def perform_on_tagged_notes(usage_function, tag_id, page: int = 1):
+def perform_on_tagged_notes(usage_function, tag_id, exclude_tags, page: int = 1):
     res = rest_get('/tags/{}/notes?{}'.format(tag_id, paginate_by_title(page)))
     notes = res.json()["items"]
     for note in notes:
-        # print(note.get("title"), end=" : ")
-        usage_function(note.get("id"))
+        note_id = note.get("id")
+        all_tags = get_all_tags(note_id)     # get all tags of the current note
+        # check if any tag in the list exclude_tags is equal to any tag of the current notes' tags
+        if len(set(exclude_tags).intersection(all_tags)) == 0:  
+            # print(note.get("title"), end=" : ")
+            usage_function(note_id)
+        else:
+            note = get_note(note_id)
+            print(f"------------------------------------\nnote: {note.title}")
+            print("Excluding this note\n")
     if res.json()["has_more"]:
         return perform_on_tagged_notes(usage_function, tag_id, page + 1)
     else:
