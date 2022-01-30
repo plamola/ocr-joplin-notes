@@ -1,3 +1,3 @@
-__author__ = """Matthijs Dekker"""
+__author__ = "Matthijs Dekker"
 __email__ = "joplin-development@dekkr.nl"
-__version__ = "__version__ = '0.2.3'"
+__version__ = "0.3.0"

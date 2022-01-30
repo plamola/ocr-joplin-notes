@@ -3,13 +3,8 @@
 """Console script for ocr_joplin_notes."""
 import sys
 import click
-from .ocr_joplin_notes import (
-    set_language,
-    set_autorotation,
-    set_mode,
-    run_mode, set_add_previews,
-)
-from . import __version__
+import run_ocr
+import ocr_joplin_notes
 
 
 def parse_argument(arg):
@@ -38,7 +33,7 @@ def parse_argument(arg):
     "--language",
     "language",
     default="eng",
-    help="""Specify the OCR Language. Refer to Tesseract's documentation found here: 
+    help="""Specify the OCR Language. Refer to the Tesseract documentation found here: 
     https://github.com/tesseract-ocr/tesseract/wiki""",
 )
 @click.option(
@@ -53,9 +48,9 @@ def parse_argument(arg):
     "autorotation",
     default="yes",
     help="""Specify whether to rotate images."""
-         """ Default = yes (pecify 'no' to disable). """,
+         """ Default = yes (specify 'no' to disable). """,
 )
-@click.version_option(version=__version__)
+@click.version_option(version=ocr_joplin_notes.__version__)
 def main(
         mode="",
         tag=None,
@@ -66,17 +61,17 @@ def main(
     f""" Console script for ocr_joplin_notes.
          ocr_joplin_nodes <mode> 
     """
-    set_mode(mode)
-    set_language(language)
-    set_autorotation(parse_argument(autorotation))
-    set_add_previews(parse_argument(add_previews))
+    run_ocr.set_mode(mode)
+    run_ocr.set_language(language)
+    run_ocr.set_autorotation(parse_argument(autorotation))
+    run_ocr.set_add_previews(parse_argument(add_previews))
     click.echo("Mode: " + mode)
     if tag is not None:
         click.echo("Tag: " + tag)
     click.echo("Language: " + language)
     click.echo("Add previews: " + add_previews)
     click.echo("Autorotation: " + autorotation)
-    res = run_mode(mode, tag)
+    res = run_ocr.run_mode(mode, tag)
     if res == 0:
         click.echo("Finished")
         return 0

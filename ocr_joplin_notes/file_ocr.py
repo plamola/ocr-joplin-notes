@@ -22,6 +22,9 @@ def get_pdf_file_reader(filename):
     except PyPDF2.utils.PdfReadError as e:
         logging.warning(f"Error reading PDF {filename}: {e.message}")
         return None
+    # except ValueError as e:
+    #     logging.warning(f"Error reading PDF {filename} - {e.args}")
+    #     return None
 
 
 def pdf_page_as_image(filename, page_num=0, is_preview=False):
@@ -73,27 +76,30 @@ def rotate_image(filename):
 
 def extract_text_from_pdf(filename, language="eng"):
     pdf_reader = get_pdf_file_reader(filename)
-    text = list()
-    preview_file = None
-    for i in range(pdf_reader.numPages):
-        page = pdf_reader.getPage(i)
-        extracted_image = pdf_page_as_image(filename, i)
-        extracted_text_list = extract_text_from_image(extracted_image, language=language)
-        os.remove(extracted_image)
-        if extracted_text_list is not None:
-            extracted_text = "".join(extracted_text_list.pages)
-        else:
-            extracted_text = ""
-        embedded_text = "" + page.extractText()
-        if len(embedded_text) > len(extracted_text):
-            selected_text = embedded_text
-        else:
-            selected_text = extracted_text
-        selected_text = selected_text.strip()
-        # 10 or less characters is probably just garbage
-        if len(selected_text) > 10:
-            text.extend([selected_text])
-    return FileOcrResult(text)
+    if pdf_reader is not None:
+        text = list()
+        preview_file = None
+        for i in range(pdf_reader.numPages):
+            page = pdf_reader.getPage(i)
+            extracted_image = pdf_page_as_image(filename, i)
+            extracted_text_list = extract_text_from_image(extracted_image, language=language)
+            os.remove(extracted_image)
+            if extracted_text_list is not None:
+                extracted_text = "".join(extracted_text_list.pages)
+            else:
+                extracted_text = ""
+            embedded_text = "" + page.extractText()
+            if len(embedded_text) > len(extracted_text):
+                selected_text = embedded_text
+            else:
+                selected_text = extracted_text
+            selected_text = selected_text.strip()
+            # 10 or fewer characters is probably just garbage
+            if len(selected_text) > 10:
+                text.extend([selected_text])
+        return FileOcrResult(text)
+    else:
+        return None
 
 
 def extract_text_from_image(filename, auto_rotate=False, language="eng"):
@@ -105,7 +111,7 @@ def extract_text_from_image(filename, auto_rotate=False, language="eng"):
             result = extract_text_from_image(filename, auto_rotate=False)
             os.remove(rotated_image)
             text = result.pages[0]
-        # 10 or less characters is probably just garbage
+        # 10 or fewer characters is probably just garbage
         if len(text.strip()) > 10:
             return FileOcrResult([text.strip()])
         else:

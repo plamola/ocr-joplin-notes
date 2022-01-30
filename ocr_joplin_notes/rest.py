@@ -1,65 +1,40 @@
 import json
-import os
 
 import requests
 
-JOPLIN_TOKEN = "not-set"
-if os.environ.get('JOPLIN_TOKEN') is not None:
-    JOPLIN_TOKEN = "token=" + os.environ['JOPLIN_TOKEN']
-else:
-    print("Please set the environment variable JOPLIN_TOKEN")
-    exit(1)
-if os.environ.get('JOPLIN_SERVER') is not None:
-    JOPLIN_SERVER = os.environ['JOPLIN_SERVER']
-else:
-    JOPLIN_SERVER = "http://localhost:41184"
-    print("Environment variable JOPLIN_SERVER not set, using default value: http://localhost:41184")
 
+class RestApi:
+    def __init__(self, server, token):
+        self.token = token
+        self.server = server
 
-def rest_get(query):
-    url = JOPLIN_SERVER + query + "&" + JOPLIN_TOKEN
-    try:
-        return requests.get(url)
-    except requests.ConnectionError as e:
-        print("Connection Error. URL: {}".format(url))
-        exit(1)
+    def __create_url(self, path):
+        return self.server + path + "?" + self.token
 
+    def rest_get(self, path, params: dict = None):
+        try:
+            return requests.get(self.__create_url(path), params=params)
+        except requests.ConnectionError as e:
+            print("Connection Error.")
+            exit(1)
 
-def rest_put(query, values):
-    url = JOPLIN_SERVER + query + "?" + JOPLIN_TOKEN
-    try:
-        return requests.put(url, data=values)
-    except requests.ConnectionError as e:
-        print("Connection Error. URL: {}".format(url))
-        exit(1)
+    def rest_put(self, path, values):
+        try:
+            return requests.put(self.__create_url(path), data=values)
+        except requests.ConnectionError as e:
+            print("Connection Error.")
+            exit(1)
 
+    def rest_post(self, path, data=None, files=None):
+        try:
+            return requests.post(self.__create_url(path), data=data, files=files)
+        except requests.ConnectionError as e:
+            print("Connection Error.")
+            exit(1)
 
-def rest_post(query, values):
-    url = JOPLIN_SERVER + query + "?" + JOPLIN_TOKEN
-    try:
-        return requests.post(url, data=values)
-    except requests.ConnectionError as e:
-        print("Connection Error. URL: {}".format(url))
-        exit(1)
-
-
-def rest_post_file(query, filename, props):
-    url = JOPLIN_SERVER + query + "?" + JOPLIN_TOKEN
-    files = {
-        "data": (json.dumps(filename), open(filename, "rb")),
-        "props": (None, props),
-    }
-    try:
-        return requests.post(url, files=files)
-    except requests.ConnectionError as e:
-        print("Connection Error. URL: {}".format(url))
-        exit(1)
-
-
-def rest_delete(query):
-    url = JOPLIN_SERVER + query + "?" + JOPLIN_TOKEN
-    try:
-        return requests.delete(url)
-    except requests.ConnectionError as e:
-        print("Connection Error. URL: {}".format(url))
-        exit(1)
+    def rest_delete(self, path):
+        try:
+            return requests.delete(self.__create_url(path))
+        except requests.ConnectionError as e:
+            print("Connection Error.")
+            exit(1)

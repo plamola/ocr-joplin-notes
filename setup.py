@@ -3,7 +3,7 @@
 # Learn more: https://github.com/kennethreitz/setup.py
 
 from setuptools import setup, find_packages
-
+import ocr_joplin_notes
 
 # read the contents of your README file
 from os import path
@@ -33,12 +33,12 @@ test_requirements = []
 
 setup(
     name='ocr-joplin-notes',
-    version='0.2.3',
+    version=ocr_joplin_notes.__version__,
     description='Add OCR data to Joplin notes',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author='Matthijs Dekker',
-    author_email='joplin-development@dekkr.nl',
+    author=ocr_joplin_notes.__author__,
+    author_email=ocr_joplin_notes.__email__,
     url='https://github.com/plamola/ocr-joplin-notes',
     install_requires=requirements,
     license=license,

@@ -1,24 +1,23 @@
 import os
 from enum import Enum
+import file_ocr
+import joplin_data_wrapper
 
-from .file_ocr import (
-    extract_text_from_image,
-    extract_text_from_pdf,
-    pdf_page_as_image
-)
-from .joplin_api import (
-    find_tag_id,
-    create_tag,
-    tag_note,
-    save_resource_to_file,
-    get_note_resources,
-    get_resource,
-    save_resource,
-    perform_on_all_notes,
-    perform_on_tagged_notes,
-    get_note,
-    update_note_body,
-)
+
+JOPLIN_TOKEN = "not-set"
+if os.environ.get('JOPLIN_TOKEN') is not None:
+    JOPLIN_TOKEN = "token=" + os.environ['JOPLIN_TOKEN']
+else:
+    print("Please set the environment variable JOPLIN_TOKEN")
+    exit(1)
+if os.environ.get('JOPLIN_SERVER') is not None:
+    JOPLIN_SERVER = os.environ['JOPLIN_SERVER']
+else:
+    JOPLIN_SERVER = "http://localhost:41184"
+    print("Environment variable JOPLIN_SERVER not set, using default value: http://localhost:41184")
+
+
+Joplin = joplin_data_wrapper.JoplinDataWrapper(JOPLIN_SERVER, JOPLIN_TOKEN)
 
 
 def set_language(language):
@@ -63,13 +62,13 @@ def run_mode(mode, tag):
     if mode == "TAG_NOTES":
         print("Tagging notes. This might take a while. You can follow the progress by watching the tags in Joplin")
         if tag is None:
-            perform_on_all_notes(tag_note_with_source)
+            Joplin.perform_on_all_note_ids(tag_note_with_source)
         else:
-            tag_id = find_tag_id(tag)
+            tag_id = Joplin.find_tag_id_by_title(tag)
             if tag_id is None:
                 print("tag not found")
                 return -1
-            perform_on_tagged_notes(tag_note_with_source, tag_id)
+            Joplin.perform_on_tagged_note_ids(tag_note_with_source, tag_id)
         return 0
     elif mode == "DRY_RUN":
         set_dry_run(True)
@@ -84,38 +83,38 @@ def run_mode(mode, tag):
 
 def full_run(tag):
     print("Starting OCR for tag {}.".format(tag))
-    tag_id = find_tag_id(tag)
+    tag_id = Joplin.find_tag_id_by_title(tag)
     if tag_id is None:
         print("Tag not found or specified")
         return -1
-    return perform_on_tagged_notes(perform_ocr_for_note, tag_id)
+    return Joplin.perform_on_tagged_note_ids(perform_ocr_for_note, tag_id)
 
 
 def tag_note_with_source(note_id):
-    note = get_note(note_id)
-    if is_note_ocr_ready(note):
+    note = Joplin.get_note_by_id(note_id)
+    if is_note_ocr_ready(note):  # TODO also make it possible to tag notes without an attachment
         if note.markup_language == 1:
             language = "markup"
         else:
             language = "html"
-        tag_title = "ojn_{}_{}".format(language, note.source)
-        create_tag(tag_title)
-        tag_note(note_id, tag_title)
+        tag_title = "ojn_{}_{}".format(language, note.source.lower().replace(' ', '-'))
+        Joplin.create_tag(tag_title)
+        Joplin.tag_note(note_id, tag_title)
         return tag_title
     return None
 
 
 def is_note_ocr_ready(note):
-    if is_created_by_rest__uploader(note):
+    if is_created_by_rest_uploader(note):
         # Skip notes already containing OCR data
         return False
     elif has_existing_ocr_section(note):
-        # Already processed by this script
+        # Already processed by this application
         return False
     else:
-        resources = get_note_resources(note.id)
+        resources = Joplin.get_note_resources(note.id)
         for res in resources:
-            resource = get_resource(res.get("id"))
+            resource = Joplin.get_resource_by_id(res.get("id"))
             if resource.mime[:5] == "image" or resource.mime == "application/pdf":
                 return True
     return False
@@ -125,9 +124,9 @@ def has_existing_ocr_section(note):
     return SCAN_HEADER in note.body
 
 
-def is_created_by_rest__uploader(note):
+def is_created_by_rest_uploader(note):
     """If the note starts with: <filename> uploaded from <host>
-    and has a HTML comment section,
+    and has an HTML comment section,
     and has at least one attachment
     assume it contains OCR data from the rest_uploader"""
     first_lines = "{}".format(note.body).split("\n", 3)
@@ -137,15 +136,15 @@ def is_created_by_rest__uploader(note):
     comment_start = "\n<!---\n" in note.body
     comment_end = "\n-->\n" in note.body
     markup = note.markup_language == 1
-    has_attachment = len(get_note_resources(note.id)) > 0
+    has_attachment = len(Joplin.get_note_resources(note.id)) > 0
     return uploaded_from & filename_exists & comment_start & comment_end & markup & has_attachment
 
 
 def perform_ocr_for_note(note_id):
-    note = get_note(note_id)
+    note = Joplin.get_note_by_id(note_id)
     result_tag = ocr_resources(note)
-    create_tag(result_tag.value)
-    tag_note(note_id, result_tag.value)
+    Joplin.create_tag(result_tag.value)
+    Joplin.tag_note(note_id, result_tag.value)
     return result_tag
 
 
@@ -153,12 +152,14 @@ def ocr_resources(note):
     print(f"------------------------------------\nnote: {note.title}")
     if is_note_ocr_ready(note):
         result = ""
-        resources = get_note_resources(note.id)
+        resources = Joplin.get_note_resources(note.id)
         for resource_json in resources:
-            resource = get_resource(resource_json.get("id"))
-            print(f"- file: {resource.title}")
+            resource = Joplin.get_resource_by_id(resource_json.get("id"))
+            print(f"- file: {resource.title} [{resource.mime}]")
             data = ocr_resource(resource, ADD_PREVIEWS and note.markup_language == 2)
-            if data.pages is not None:
+            if data.success is False:
+                return ResultTag.OCR_FAILED
+            elif data.pages is not None and len(data.pages) > 0:
                 print(f"  - pages extracted: {len(data.pages)}")
                 resulting_text = ""
                 if data.input_resource_type == ResourceType.PDF:
@@ -179,7 +180,7 @@ def ocr_resources(note):
         if len(result.strip()) > 0:
             ocr_section = '\n\n{}\n{}\n'.format(SCAN_HEADER, result)
             if not DRY_RUN:
-                update_note_body(note.id, note.body + ocr_section)
+                Joplin.update_note_body(note.id, note.body + ocr_section)
                 print("Result: note updated")
             else:
                 print("Result: note would have been updated [dry run]")
@@ -193,7 +194,7 @@ def ocr_resources(note):
 
 
 def add_preview(note, title, data):
-    res_id = save_resource(note.id, data.preview_file, title)
+    res_id = Joplin.save_preview_image_as_resource(note.id, data.preview_file, title)
     if note.markup_language == 1:
         preview_file_link = "![{}](:/{})".format(title, res_id)
     else:
@@ -207,29 +208,40 @@ class ResourceType(Enum):
 
 
 class OcrResult:
-    def __init__(self, pages, input_resource_type=ResourceType.IMAGE, preview_file=None):
+    def __init__(self, pages, input_resource_type=ResourceType.IMAGE, preview_file=None, success=True):
         self.pages = pages
         self.input_resource_type = input_resource_type
         self.preview_file = preview_file
+        self.success = success
 
 
 def ocr_resource(resource, create_preview=True):
     mime_type = resource.mime
-    full_path = save_resource_to_file(resource)
+    full_path = Joplin.save_resource_to_file(resource)
     try:
         if mime_type[:5] == "image":
-            result = extract_text_from_image(full_path, auto_rotate=AUTOROTATION, language=LANGUAGE)
+            result = file_ocr.extract_text_from_image(full_path, auto_rotate=AUTOROTATION, language=LANGUAGE)
             if result is not None:
                 return OcrResult(result.pages, ResourceType.IMAGE)
         elif mime_type == "application/pdf":
-            ocr_result = extract_text_from_pdf(full_path, language=LANGUAGE)
-            if create_preview:
-                preview_file = pdf_page_as_image(full_path, is_preview=True)
-                return OcrResult(ocr_result.pages, ResourceType.PDF, preview_file)
+            ocr_result = file_ocr.extract_text_from_pdf(full_path, language=LANGUAGE)
+            if ocr_result is None:
+                print("No result found")
+                return OcrResult(None, success=False)
             else:
-                return OcrResult(ocr_result.pages, ResourceType.PDF)
+                if create_preview:
+                    preview_file = file_ocr.pdf_page_as_image(full_path, is_preview=True)
+                    return OcrResult(ocr_result.pages, ResourceType.PDF, preview_file)
+                else:
+                    return OcrResult(ocr_result.pages, ResourceType.PDF)
         return OcrResult(None)
     except (TypeError, OSError) as e:
+        print("Error: " + str(e))
         return OcrResult(None)
     finally:
-        os.remove(full_path)
+        try:
+            os.remove(full_path)
+        except PermissionError as e:
+            print("Permission Error: " + str(e))
+            print("File: " + str(resource.title))
+            return OcrResult(None, success=False)
