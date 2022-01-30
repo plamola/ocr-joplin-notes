@@ -20,7 +20,7 @@ def get_pdf_file_reader(filename):
     try:
         return PyPDF2.PdfFileReader(open(filename, "rb"), strict=False)
     except PyPDF2.utils.PdfReadError as e:
-        logging.warning(f"Error reading PDF {filename}: {e.message}")
+        logging.warning(f"Error reading PDF {filename}: {str(e)}")
         return None
     # except ValueError as e:
     #     logging.warning(f"Error reading PDF {filename} - {e.args}")

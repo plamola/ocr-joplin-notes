@@ -7,6 +7,6 @@ RUN apt-get update \
 
 ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata
 
-RUN pip install ocr-joplin-notes==0.3.0 opencv-python==4.5.1.48
+RUN pip install ocr-joplin-notes==0.3.1 opencv-python==4.5.1.48
 
 CMD ["python", "-m", "ocr_joplin_notes.cli"]
