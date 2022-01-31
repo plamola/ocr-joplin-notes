@@ -41,6 +41,15 @@ class JoplinDataWrapper:
         list_of_tags = list([dic.get("title") for dic in tags])
         return list_of_tags
 
+    def is_valid_connection(self):
+        try:
+            res = self.REST.rest_get('/notes')
+            error = res.json()["error"]
+            print(error)
+            return False
+        except KeyError as e:
+            return True
+
     def find_tag_id_by_title(self, title: str, page: int = 1):
         if title is None:
             return None

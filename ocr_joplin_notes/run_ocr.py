@@ -59,6 +59,8 @@ class ResultTag(Enum):
 
 
 def run_mode(mode, tag, exclude_tags):
+    if not Joplin.is_valid_connection():
+        return -1
     if mode == "TAG_NOTES":
         print("Tagging notes. This might take a while. You can follow the progress by watching the tags in Joplin")
         if tag is None and exclude_tags is None:
