@@ -1,7 +1,7 @@
 import os
 from enum import Enum
-import file_ocr
-import joplin_data_wrapper
+from ocr_joplin_notes import file_ocr
+from ocr_joplin_notes import joplin_data_wrapper
 
 
 JOPLIN_TOKEN = "not-set"

@@ -3,7 +3,7 @@
 """Console script for ocr_joplin_notes."""
 import sys
 import click
-import run_ocr
+from ocr_joplin_notes import run_ocr
 import ocr_joplin_notes
 
 

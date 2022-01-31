@@ -1,7 +1,7 @@
 import json
 import tempfile
 
-import rest
+from ocr_joplin_notes import rest
 
 
 class JoplinNote:
