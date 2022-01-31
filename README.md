@@ -101,12 +101,17 @@ There is a docker image available, for those who do not want to install all the 
 docker run  --env-file ./docker-env  --network="host" plamola/ocr-joplin-notes:0.2.3 python -m ocr_joplin_notes.cli --mode=TAG_NOTES
 ```
 For this to work, you need to save you Joplin token saved in a file. In the example, the file is called `docker-env`. 
-The contents of this file will look someting like:
+The contents of this file will look something like:
 ```
 JOPLIN_TOKEN=f11db775b76e0f80ab39a932s3f79298d080d
 ```
-Note the `--network="host"` parameter, to allow for access to localhost. This only seems to work on Linux systems.
-For Windows and Mac,docker might not be an option.                                                                                                   
+**Note**: the `--network="host"` parameter, to allow for access to localhost. This only seems to work on Linux systems.
+
+For Windows and Mac users, the workaround is to add the `JOPLIN_SERVER` environment variable in the docker-env file: 
+```
+JOPLIN_SERVER=http://host.docker.internal:41184
+# It also works with JOPLIN_SERVER=http://gateway.docker.internal:41184 as the docs indicate
+```
 
 ### Still to do
 * Daemonize this module
