@@ -16,15 +16,15 @@ class FileOcrResult:
         self.pages = pages
 
 
-def get_pdf_file_reader(filename):
+def get_pdf_file_reader(file):
     try:
-        return PyPDF2.PdfFileReader(open(filename, "rb"), strict=False)
+        return PyPDF2.PdfFileReader(file, strict=False)
     except PyPDF2.utils.PdfReadError as e:
-        logging.warning(f"Error reading PDF {filename}: {str(e)}")
+        logging.warning(f"Error reading PDF: {str(e)}")
         return None
-    # except ValueError as e:
-    #     logging.warning(f"Error reading PDF {filename} - {e.args}")
-    #     return None
+    except ValueError as e:
+        logging.warning(f"Error reading PDF - {e.args}")
+        return None
 
 
 def pdf_page_as_image(filename, page_num=0, is_preview=False):
@@ -75,7 +75,8 @@ def rotate_image(filename):
 
 
 def extract_text_from_pdf(filename, language="eng"):
-    pdf_reader = get_pdf_file_reader(filename)
+    file = open(filename, "rb")
+    pdf_reader = get_pdf_file_reader(file)
     if pdf_reader is not None:
         text = list()
         preview_file = None
@@ -97,8 +98,10 @@ def extract_text_from_pdf(filename, language="eng"):
             # 10 or fewer characters is probably just garbage
             if len(selected_text) > 10:
                 text.extend([selected_text])
+            file.close()
         return FileOcrResult(text)
     else:
+        file.close()
         return None
 
 

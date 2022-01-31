@@ -58,36 +58,36 @@ class ResultTag(Enum):
     OCR_ADDED = "ojn_ocr_added"
 
 
-def run_mode(mode, tag):
+def run_mode(mode, tag, exclude_tags):
     if mode == "TAG_NOTES":
         print("Tagging notes. This might take a while. You can follow the progress by watching the tags in Joplin")
-        if tag is None:
+        if tag is None and exclude_tags is None:
             Joplin.perform_on_all_note_ids(tag_note_with_source)
         else:
             tag_id = Joplin.find_tag_id_by_title(tag)
             if tag_id is None:
                 print("tag not found")
                 return -1
-            Joplin.perform_on_tagged_note_ids(tag_note_with_source, tag_id)
+            Joplin.perform_on_tagged_note_ids(tag_note_with_source, tag_id, exclude_tags)
         return 0
     elif mode == "DRY_RUN":
         set_dry_run(True)
-        return full_run(tag)
+        return full_run(tag, exclude_tags)
     elif mode == "FULL_RUN":
         set_dry_run(False)
-        return full_run(tag)
+        return full_run(tag, exclude_tags)
     else:
         print(f"Mode {mode} not supported")
     return -1
 
 
-def full_run(tag):
+def full_run(tag, exclude_tags):
     print("Starting OCR for tag {}.".format(tag))
     tag_id = Joplin.find_tag_id_by_title(tag)
     if tag_id is None:
         print("Tag not found or specified")
         return -1
-    return Joplin.perform_on_tagged_note_ids(perform_ocr_for_note, tag_id)
+    return Joplin.perform_on_tagged_note_ids(perform_ocr_for_note, tag_id, exclude_tags)
 
 
 def tag_note_with_source(note_id):

@@ -29,6 +29,13 @@ def parse_argument(arg):
     help="""Specify the Joplin tag""",
 )
 @click.option(
+    "--exclude_tags",
+    "exclude_tags",
+    default=None,
+    multiple=True,
+    help="""Specify the Joplin tags to be excluded""",
+)
+@click.option(
     "-l",
     "--language",
     "language",
@@ -54,6 +61,7 @@ def parse_argument(arg):
 def main(
         mode="",
         tag=None,
+        exclude_tags=None,
         language="eng",
         add_previews="yes",
         autorotation="yes",
@@ -68,10 +76,12 @@ def main(
     click.echo("Mode: " + mode)
     if tag is not None:
         click.echo("Tag: " + tag)
+    if exclude_tags is not None:
+        click.echo("Exclude Tags: " + str(exclude_tags))
     click.echo("Language: " + language)
     click.echo("Add previews: " + add_previews)
     click.echo("Autorotation: " + autorotation)
-    res = run_ocr.run_mode(mode, tag)
+    res = run_ocr.run_mode(mode, tag, exclude_tags)
     if res == 0:
         click.echo("Finished")
         return 0

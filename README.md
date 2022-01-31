@@ -1,7 +1,7 @@
 OCR Joplin notes
 ========================
 
-This scrip will try to add OCR data, and possibly a preview image, to notes in Joplin. It will only work on notes with a tag, which must be specified on startup.
+This script will try to add OCR data, and possibly a preview image, to notes in Joplin. It will only work on notes with a tag, which must be specified on startup.
 
 ### Use cases 
 #### 1. As a Joplin user, I want to be able to search for any text, whether it is in the note itself, or in an attachment.
@@ -67,6 +67,8 @@ Every note will be tagged with one of the following tags:
 *Parameters*:
 * [required] `--tag`="my_tag"
   Only notes having the specified tag will be scanned.
+* [optional] `--exclude_tags`="other_tag"
+  Notes having the specified tag will be ignored. This Parameter can be set multiple times to exclude multiple tags.
 * [optional] `--add-preview`=`on`|`off`
   When `on`, adds a preview image for every PDF found in an HTML note. Default is `on`
   Markdown notes already have a PDF preview in the client.
@@ -88,7 +90,8 @@ This is mode you are looking for.
 ```shell
 python3 -m ocr_joplin_notes.cli --mode=TAG_NOTES
 python3 -m ocr_joplin_notes.cli --mode=DRY_RUN --tag=my_notes_test --language=nld --add-previews=off
-python3 -m ocr_joplin_notes.cli --mode=FULL_RUN --tag=my_notes_for --language=get 
+python3 -m ocr_joplin_notes.cli --mode=FULL_RUN --tag=my_notes_for_testing --language=get
+python3 -m ocr_joplin_notes.cli --mode=FULL_RUN --tag=special_notes --exclude_tags=technical --exclude_tags=art 
 ```
 
 ### Docker example
