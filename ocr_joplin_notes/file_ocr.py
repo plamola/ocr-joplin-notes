@@ -98,7 +98,7 @@ def extract_text_from_pdf(filename, language="eng"):
             # 10 or fewer characters is probably just garbage
             if len(selected_text) > 10:
                 text.extend([selected_text])
-            file.close()
+        file.close()
         return FileOcrResult(text)
     else:
         file.close()
