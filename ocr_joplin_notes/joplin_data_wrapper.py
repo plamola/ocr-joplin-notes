@@ -96,7 +96,7 @@ class JoplinDataWrapper:
                 print(f"------------------------------------\nnote: {note.title}")
                 print("Excluding this note\n")
         if res.json()["has_more"]:
-            return self.perform_on_tagged_note_ids(usage_function, exclude_tags, tag_id, page + 1)
+            return self.perform_on_tagged_note_ids(usage_function, tag_id, exclude_tags, page + 1)
         else:
             return 0
 
