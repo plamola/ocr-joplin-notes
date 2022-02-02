@@ -4,6 +4,7 @@ import tempfile
 from uuid import uuid4
 import cv2
 import numpy as np
+import pdb
 
 import PyPDF2
 from PIL import Image
@@ -95,8 +96,11 @@ def extract_text_from_pdf(filename, language="eng"):
             os.remove(extracted_image)
             if extracted_text_list is not None:
                 extracted_text = "".join(extracted_text_list.pages)
+#               custom addition
+                print(f"Page {i+1} of {pdf_reader.numPages} processed successfully.")
             else:
                 extracted_text = ""
+                print(f"Page {i+1} of {pdf_reader.numPages} processed with no text recognized.")
             embedded_text = "" + page.extractText()
             if len(embedded_text) > len(extracted_text):
                 selected_text = embedded_text
@@ -126,7 +130,7 @@ def extract_text_from_image(filename, auto_rotate=False, language="eng"):
         if len(text.strip()) > 10:
             return FileOcrResult([text.strip()])
         else:
-            return FileOcrResult(None)
+            return None
     except TesseractError as e:
         logging.debug(e.message)
     return None
