@@ -4,7 +4,6 @@ import tempfile
 from uuid import uuid4
 import cv2
 import numpy as np
-import pdb
 
 import PyPDF2
 from PIL import Image
