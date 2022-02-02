@@ -228,7 +228,6 @@ def ocr_resource(resource, create_preview=True):
         elif mime_type == "application/pdf":
             ocr_result = file_ocr.extract_text_from_pdf(full_path, language=LANGUAGE)
             if ocr_result is None:
-                print("No result found")
                 return OcrResult(None, success=False)
             else:
                 if create_preview:
@@ -238,8 +237,7 @@ def ocr_resource(resource, create_preview=True):
                     return OcrResult(ocr_result.pages, ResourceType.PDF)
         return OcrResult(None)
     except (TypeError, OSError) as e:
-        print("Error: " + str(e))
-        return OcrResult(None)
+        return OcrResult(None, success=False)
     finally:
         try:
             os.remove(full_path)
