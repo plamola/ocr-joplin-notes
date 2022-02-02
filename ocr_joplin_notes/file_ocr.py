@@ -62,6 +62,8 @@ def rotate_image(filename):
     """
     # Inspired by https://www.pyimagesearch.com/2017/02/20/text-skew-correction-opencv-python/
     image = cv2.imread(filename, cv2.IMREAD_COLOR) # Initially decode as color
+    if image is None:
+        return None
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     gray = cv2.bitwise_not(gray)
     threshold = cv2.threshold(gray, 0, 255,
@@ -122,7 +124,9 @@ def extract_text_from_image(filename, auto_rotate=False, language="eng"):
         text = image_to_string(img, lang=language)
         if auto_rotate:
             rotated_image = rotate_image(filename)
-            result = extract_text_from_image(filename, auto_rotate=False)
+            if rotated_image is None:
+                return None
+            result = extract_text_from_image(filename, auto_rotate=False, language=language)
             os.remove(rotated_image)
             text = result.pages[0]
         # 10 or fewer characters is probably just garbage
@@ -131,5 +135,5 @@ def extract_text_from_image(filename, auto_rotate=False, language="eng"):
         else:
             return None
     except TesseractError as e:
-        logging.debug(e.message)
-    return None
+        print(f"TesseractError {e.message}")
+        return None

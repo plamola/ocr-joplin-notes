@@ -13,17 +13,17 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 
 requirements = [
-    "numpy>=1.20.1",
-    "setuptools~=53.0.0",
+    "numpy>=1.22.1",
+    "setuptools~=60.7.0",
     "pytz>=2021.1",
     "nose>=1.3.7",
-    "opencv-python>=4.5.1.48",
-    "click>=7.1.2",
-    "requests>=2.25.1",
+    "opencv-python>=4.5.5.62",
+    "click>=8.0.3",
+    "requests>=2.27.1",
     "PyPDF2>=1.26.0",
-    "Pillow>=8.1.0",
-    "pdf2image>=1.14.0",
-    "pytesseract>=0.3.7",
+    "Pillow>=9.0.0",
+    "pdf2image>=1.16.0",
+    "pytesseract>=0.3.8",
 ]
 
 setup_requirements = []
@@ -41,7 +41,7 @@ setup(
     author_email=ocr_joplin_notes.__email__,
     url='https://github.com/plamola/ocr-joplin-notes',
     install_requires=requirements,
-    license=license,
+    license="MIT",
     packages=find_packages(exclude=('tests', 'docs')),
     include_package_data=True,
     keywords=["ocr-joplin-notes", "joplin", "ocr-joplin-notes"],
