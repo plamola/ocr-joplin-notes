@@ -26,7 +26,7 @@ For a quick installation, there is a docker version available. See the examples 
 
 If you don't like docker, there is the manual installation option.
 If you already installed [rest_uploader](https://github.com/kellerjustin/rest-uploader) you probably almost setup already.
-All that is left is to install this scrip and setup the environment variables.
+All that is left is to install this script and setup the environment variables.
 
 ```shell
 pip install ocr-joplin-notes
@@ -111,6 +111,12 @@ For Windows and Mac users, the workaround is to add the `JOPLIN_SERVER` environm
 ```
 JOPLIN_SERVER=http://host.docker.internal:41184
 # It also works with JOPLIN_SERVER=http://gateway.docker.internal:41184 as the docs indicate
+```
+**Optional Max image pixels environment variable**
+The OCR process for PDFs will experience errors and stop if your PDFs have large images contained within the file.  There is a tunable parameter that allows you to process larger files without errors in exchange for higher memory usage.  You can tune this parameter by setting the environment variable MAX_IMAGE_PIXELS in your docker-env file. The default max is 178956970. (this default size can cause errors with PDFs as small as 3MB, so if you experience these errors, you can experiment with increasing the value as seen in the example below)
+
+```
+MAX_IMAGE_PIXELS=400000000
 ```
 
 ### Still to do

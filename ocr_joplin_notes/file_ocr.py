@@ -7,6 +7,14 @@ import numpy as np
 
 import PyPDF2
 from PIL import Image
+# large images within PDFs cause a decompression bomb error (a form of protection from abuse)
+# this setting allows the user to configure how large an image they are comfortable processing
+# The tradeoff to a large max size here is memory consumption, which the user can self-regulate
+# using this setting.  If they do not set the variable, it remains at the default for PIL.
+
+MAX_IMAGE_PIXELS = os.environ.get('MAX_IMAGE_PIXELS',178956970) # this is the default PIL max size
+Image.MAX_IMAGE_PIXELS = int(MAX_IMAGE_PIXELS)
+
 from pdf2image import convert_from_path
 from pytesseract import image_to_string, TesseractError
 
