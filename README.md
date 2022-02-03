@@ -98,7 +98,7 @@ python3 -m ocr_joplin_notes.cli --mode=FULL_RUN --tag=special_notes --exclude_ta
 
 There is a docker image available, for those who do not want to install all the Python dependencies.
 ```shell
-docker run  --env-file ./docker-env  --network="host" plamola/ocr-joplin-notes:0.2.3 python -m ocr_joplin_notes.cli --mode=TAG_NOTES
+docker run  --env-file ./docker-env  --network="host" plamola/ocr-joplin-notes:0.3.11 python -m ocr_joplin_notes.cli --mode=TAG_NOTES
 ```
 For this to work, you need to save you Joplin token saved in a file. In the example, the file is called `docker-env`. 
 The contents of this file will look something like:
