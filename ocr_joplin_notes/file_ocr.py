@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 
 import PyPDF2
+from PyPDF2 import PdfFileReader
 from PIL import Image
 # large images within PDFs cause a decompression bomb error (a form of protection from abuse)
 # this setting allows the user to configure how large an image they are comfortable processing
@@ -22,7 +23,6 @@ from pytesseract import image_to_string, TesseractError
 class FileOcrResult:
     def __init__(self, pages):
         self.pages = pages
-
 
 def get_pdf_file_reader(file):
     try:
@@ -86,36 +86,42 @@ def rotate_image(filename):
 
 def extract_text_from_pdf(filename, language="eng"):
     file = open(filename, "rb")
-    pdf_reader = get_pdf_file_reader(file)
-    if pdf_reader is not None:
-        text = list()
-        preview_file = None
-        for i in range(pdf_reader.numPages):
-            page = pdf_reader.getPage(i)
-            extracted_image = pdf_page_as_image(filename, i)
-            extracted_text_list = extract_text_from_image(extracted_image, language=language)
-            os.remove(extracted_image)
-            if extracted_text_list is not None:
-                extracted_text = "".join(extracted_text_list.pages)
-#               custom addition
-                print(f"Page {i+1} of {pdf_reader.numPages} processed successfully.")
-            else:
-                extracted_text = ""
-                print(f"Page {i+1} of {pdf_reader.numPages} processed with no text recognized.")
-            embedded_text = "" + page.extractText()
-            if len(embedded_text) > len(extracted_text):
-                selected_text = embedded_text
-            else:
-                selected_text = extracted_text
-            selected_text = selected_text.strip()
-            # 10 or fewer characters is probably just garbage
-            if len(selected_text) > 10:
-                text.extend([selected_text])
-        file.close()
-        return FileOcrResult(text)
-    else:
-        file.close()
+    encryption_checked_file = PdfFileReader(file)
+
+    if encryption_checked_file.isEncrypted:
+        print(f'    --NOTICE: This file is encrypted and cannot be read by Joplin OCR\n')
         return None
+
+    else:
+        pdf_reader = get_pdf_file_reader(file)
+        if pdf_reader is not None:
+            text = list()
+            preview_file = None
+            for i in range(pdf_reader.numPages):
+                page = pdf_reader.getPage(i)
+                extracted_image = pdf_page_as_image(filename, i)
+                extracted_text_list = extract_text_from_image(extracted_image, language=language)
+                os.remove(extracted_image)
+                if extracted_text_list is not None:
+                    extracted_text = "".join(extracted_text_list.pages)
+                    print(f"Page {i+1} of {pdf_reader.numPages} processed successfully.")
+                else:
+                    extracted_text = ""
+                    print(f"Page {i+1} of {pdf_reader.numPages} processed with no text recognized.")
+                embedded_text = "" + page.extractText()
+                if len(embedded_text) > len(extracted_text):
+                    selected_text = embedded_text
+                else:
+                    selected_text = extracted_text
+                selected_text = selected_text.strip()
+                # 10 or fewer characters is probably just garbage
+                if len(selected_text) > 10:
+                    text.extend([selected_text])
+            file.close()
+            return FileOcrResult(text)
+        else:
+            file.close()
+            return None
 
 
 def extract_text_from_image(filename, auto_rotate=False, language="eng"):
