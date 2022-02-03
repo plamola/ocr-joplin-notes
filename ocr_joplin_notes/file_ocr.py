@@ -128,7 +128,10 @@ def extract_text_from_image(filename, auto_rotate=False, language="eng"):
                 return None
             result = extract_text_from_image(filename, auto_rotate=False, language=language)
             os.remove(rotated_image)
-            text = result.pages[0]
+            if result is not None:
+                text = result.pages[0]
+            else:
+                return None
         # 10 or fewer characters is probably just garbage
         if len(text.strip()) > 10:
             return FileOcrResult([text.strip()])
