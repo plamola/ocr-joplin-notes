@@ -97,7 +97,6 @@ def extract_text_from_pdf(filename, language="eng"):
             os.remove(extracted_image)
             if extracted_text_list is not None:
                 extracted_text = "".join(extracted_text_list.pages)
-#               custom addition
                 print(f"Page {i+1} of {pdf_reader.numPages} processed successfully.")
             else:
                 extracted_text = ""
