@@ -120,7 +120,8 @@ class JoplinDataWrapper:
     def save_resource_to_file(self, resource: JoplinResource):
         file_download = self.REST.rest_get('/resources/{}/file'.format(resource.id), None)
         full_path = tempfile.mktemp(dir=tempfile.tempdir)
-        open(full_path, 'wb').write(file_download.content)
+        with open(full_path, 'wb') as f:
+            f.write(file_download.content)
         return full_path
 
     def get_note_resources(self, note_id):
