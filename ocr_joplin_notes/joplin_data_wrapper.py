@@ -133,10 +133,11 @@ class JoplinDataWrapper:
         return JoplinResource(res.json())
 
     def save_preview_image_as_resource(self, note_id, filename: str, title: str):
-        props = f'{{"title":"{title}", "filename":"{title}.png"}}'
-        files = {
-            "data": (json.dumps(filename), open(filename, "rb")),
-            "props": (None, props),
-        }
-        res = self.REST.rest_post("/resources/{}".format(note_id), files=files)
-        return res.json()["id"]
+        with open(filename, "rb") as file:
+            props = f'{{"title":"{title}", "filename":"{title}.png"}}'
+            files = {
+                "data": (json.dumps(filename), file),
+                "props": (None, props),
+            }
+            res = self.REST.rest_post("/resources/{}".format(note_id), files=files)
+            return res.json()["id"]

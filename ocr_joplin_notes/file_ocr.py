@@ -7,16 +7,16 @@ import numpy as np
 
 import PyPDF2
 from PIL import Image
+from pdf2image import convert_from_path
+from pytesseract import image_to_string, TesseractError
+
 # large images within PDFs cause a decompression bomb error (a form of protection from abuse)
 # this setting allows the user to configure how large an image they are comfortable processing
 # The tradeoff to a large max size here is memory consumption, which the user can self-regulate
 # using this setting.  If they do not set the variable, it remains at the default for PIL.
 
-MAX_IMAGE_PIXELS = os.environ.get('MAX_IMAGE_PIXELS',178956970) # this is the default PIL max size
+MAX_IMAGE_PIXELS = os.environ.get('MAX_IMAGE_PIXELS', 178956970)  # this is the default PIL max size
 Image.MAX_IMAGE_PIXELS = int(MAX_IMAGE_PIXELS)
-
-from pdf2image import convert_from_path
-from pytesseract import image_to_string, TesseractError
 
 
 class FileOcrResult:
@@ -24,7 +24,7 @@ class FileOcrResult:
         self.pages = pages
 
 
-def get_pdf_file_reader(file):
+def __get_pdf_file_reader(file):
     try:
         return PyPDF2.PdfFileReader(file, strict=False)
     except PyPDF2.utils.PdfReadError as e:
@@ -46,7 +46,7 @@ def pdf_page_as_image(filename, page_num=0, is_preview=False):
     return temp_file
 
 
-def get_image(filename):
+def __get_image(filename):
     try:
         return Image.open(filename)
     except OSError:
@@ -54,7 +54,7 @@ def get_image(filename):
         return None
 
 
-def rotate_image(filename):
+def __rotate_image(filename):
     """
      Tries to deskew the image; will not rotate it more than 90 degrees
     :param filename:
@@ -85,9 +85,13 @@ def rotate_image(filename):
 
 
 def extract_text_from_pdf(filename, language="eng"):
-    file = open(filename, "rb")
-    pdf_reader = get_pdf_file_reader(file)
-    if pdf_reader is not None:
+    with open(filename, "rb") as file:
+        pdf_reader = __get_pdf_file_reader(file)
+        if pdf_reader is None:
+            return None
+        if pdf_reader.isEncrypted:
+            print('    --NOTICE: This file is encrypted and cannot be read by Joplin OCR\n')
+            return None
         text = list()
         preview_file = None
         for i in range(pdf_reader.numPages):
@@ -97,11 +101,10 @@ def extract_text_from_pdf(filename, language="eng"):
             os.remove(extracted_image)
             if extracted_text_list is not None:
                 extracted_text = "".join(extracted_text_list.pages)
-#               custom addition
-                print(f"Page {i+1} of {pdf_reader.numPages} processed successfully.")
+                print(f"Page {i + 1} of {pdf_reader.numPages} processed successfully.")
             else:
                 extracted_text = ""
-                print(f"Page {i+1} of {pdf_reader.numPages} processed with no text recognized.")
+                print(f"Page {i + 1} of {pdf_reader.numPages} processed with no text recognized.")
             embedded_text = "" + page.extractText()
             if len(embedded_text) > len(extracted_text):
                 selected_text = embedded_text
@@ -111,27 +114,22 @@ def extract_text_from_pdf(filename, language="eng"):
             # 10 or fewer characters is probably just garbage
             if len(selected_text) > 10:
                 text.extend([selected_text])
-        file.close()
         return FileOcrResult(text)
-    else:
-        file.close()
-        return None
 
 
 def extract_text_from_image(filename, auto_rotate=False, language="eng"):
     try:
-        img = get_image(filename)
+        img = __get_image(filename)
         text = image_to_string(img, lang=language)
         if auto_rotate:
-            rotated_image = rotate_image(filename)
+            rotated_image = __rotate_image(filename)
             if rotated_image is None:
                 return None
             result = extract_text_from_image(filename, auto_rotate=False, language=language)
             os.remove(rotated_image)
-            if result is not None:
-                text = result.pages[0]
-            else:
+            if result is None:
                 return None
+            text = result.pages[0]
         # 10 or fewer characters is probably just garbage
         if len(text.strip()) > 10:
             return FileOcrResult([text.strip()])
